@@ -1,1 +1,1 @@
-# SQL schema / seeds
+Run locally. No data here.

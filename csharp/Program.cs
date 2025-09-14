@@ -1,10 +1,38 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq; 
 
 public class Program
 {
-    private static string dbPath = Path.Combine("..", "data", "books.db");
+    private static string dbPath = GetDatabasePath();
+
+    private class Book
+    {
+        // Use the 'required' keyword for non-nullable properties that are set during object creation.
+        public required int Id { get; set; }
+        public required string Title { get; set; }
+        public required string Author { get; set; }
+        public required string Genre { get; set; }
+        public required int Year { get; set; }
+    }
+
+    private static string GetDatabasePath()
+    {
+        string? projectDirectory = AppContext.BaseDirectory;
+        while (!string.IsNullOrEmpty(projectDirectory) && !File.Exists(Path.Combine(projectDirectory, "README.md")))
+        {
+            projectDirectory = Directory.GetParent(projectDirectory)?.FullName;
+        }
+
+        if (string.IsNullOrEmpty(projectDirectory))
+        {
+            throw new InvalidOperationException("Could not find the project root directory.");
+        }
+
+        return Path.Combine(projectDirectory, "data", "books.db");
+    }
 
     public static void Main(string[] args)
     {
@@ -45,7 +73,8 @@ public class Program
 
     private static void InitializeDatabase()
     {
-        var dbDirectory = Path.GetDirectoryName(dbPath);
+        // Use the null-forgiving operator (!) to tell the compiler you know dbPath is not null.
+        var dbDirectory = Path.GetDirectoryName(dbPath)!;
         if (!Directory.Exists(dbDirectory))
         {
             Directory.CreateDirectory(dbDirectory);
@@ -73,11 +102,12 @@ public class Program
     {
         Console.WriteLine("Enter book details:");
         Console.Write("Title: ");
-        string title = Console.ReadLine();
+        // Use the null-forgiving operator (!) to assert that ReadLine() won't return null.
+        string title = Console.ReadLine()!;
         Console.Write("Author: ");
-        string author = Console.ReadLine();
+        string author = Console.ReadLine()!;
         Console.Write("Genre: ");
-        string genre = Console.ReadLine();
+        string genre = Console.ReadLine()!;
         Console.Write("Year: ");
         int year;
         while (!int.TryParse(Console.ReadLine(), out year))
@@ -102,96 +132,100 @@ public class Program
             command.ExecuteNonQuery();
         }
 
-        Console.WriteLine("Book added successfully! 👍");
+        Console.WriteLine("Book added successfully! ");
     }
 
     private static void ListBooks()
     {
         Console.WriteLine("\n--- All Books ---");
-        using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+        var allBooks = GetAllBooks();
+
+        if (!allBooks.Any())
         {
-            connection.Open();
-            var command = connection.CreateCommand();
-            command.CommandText = "SELECT title, author, genre, year FROM books ORDER BY title;";
-            using (var reader = command.ExecuteReader())
-            {
-                if (!reader.HasRows)
-                {
-                    Console.WriteLine("No books found.");
-                    return;
-                }
-                while (reader.Read())
-                {
-                    Console.WriteLine($"Title: {reader.GetString(0)}, Author: {reader.GetString(1)}, Genre: {reader.GetString(2)}, Year: {reader.GetInt32(3)}");
-                }
-            }
+            Console.WriteLine("No books found.");
+            return;
+        }
+
+        var sortedBooks = allBooks.OrderBy(b => b.Title);
+        foreach (var book in sortedBooks)
+        {
+            Console.WriteLine($"Title: {book.Title}, Author: {book.Author}, Genre: {book.Genre}, Year: {book.Year}");
         }
     }
 
     private static void SearchBooks(string keyword)
     {
         Console.WriteLine($"\n--- Search Results for '{keyword}' ---");
-        using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+        var allBooks = GetAllBooks();
+        var matchingBooks = allBooks
+            .Where(b => b.Title.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        b.Author.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        b.Genre.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+            .OrderBy(b => b.Title);
+
+        if (!matchingBooks.Any())
         {
-            connection.Open();
-            var command = connection.CreateCommand();
-            command.CommandText =
-            @"
-                SELECT title, author, genre, year
-                FROM books
-                WHERE title LIKE @keyword OR author LIKE @keyword OR genre LIKE @keyword
-                ORDER BY title;
-            ";
-            command.Parameters.AddWithValue("@keyword", $"%{keyword}%");
-            using (var reader = command.ExecuteReader())
-            {
-                if (!reader.HasRows)
-                {
-                    Console.WriteLine("No matching books found.");
-                    return;
-                }
-                while (reader.Read())
-                {
-                    Console.WriteLine($"Title: {reader.GetString(0)}, Author: {reader.GetString(1)}, Genre: {reader.GetString(2)}, Year: {reader.GetInt32(3)}");
-                }
-            }
+            Console.WriteLine("No matching books found.");
+            return;
+        }
+
+        foreach (var book in matchingBooks)
+        {
+            Console.WriteLine($"Title: {book.Title}, Author: {book.Author}, Genre: {book.Genre}, Year: {book.Year}");
         }
     }
 
     private static void ReportBooks()
     {
         Console.WriteLine("\n--- Book Report ---");
-        
-        // Report by Genre
-        Console.WriteLine("\n📊 By Genre:");
-        using (var connection = new SqliteConnection($"Data Source={dbPath}"))
+        var allBooks = GetAllBooks();
+
+        Console.WriteLine("\n By Genre:");
+        var genreCounts = allBooks
+            .GroupBy(b => b.Genre)
+            .Select(g => new { Genre = g.Key, Count = g.Count() })
+            .OrderByDescending(g => g.Count);
+
+        foreach (var report in genreCounts)
         {
-            connection.Open();
-            var command = connection.CreateCommand();
-            command.CommandText = "SELECT genre, COUNT(*) as count FROM books GROUP BY genre ORDER BY count DESC;";
-            using (var reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    Console.WriteLine($"- {reader.GetString(0)}: {reader.GetInt32(1)}");
-                }
-            }
+            Console.WriteLine($"- {report.Genre}: {report.Count}");
         }
 
-        // Report by Author
-        Console.WriteLine("\n✍️ By Author:");
+        Console.WriteLine("\n By Author:");
+        var authorCounts = allBooks
+            .GroupBy(b => b.Author)
+            .Select(g => new { Author = g.Key, Count = g.Count() })
+            .OrderByDescending(g => g.Count);
+
+        foreach (var report in authorCounts)
+        {
+            Console.WriteLine($"- {report.Author}: {report.Count}");
+        }
+    }
+
+    private static List<Book> GetAllBooks()
+    {
+        var books = new List<Book>();
         using (var connection = new SqliteConnection($"Data Source={dbPath}"))
         {
             connection.Open();
             var command = connection.CreateCommand();
-            command.CommandText = "SELECT author, COUNT(*) as count FROM books GROUP BY author ORDER BY count DESC;";
+            command.CommandText = "SELECT id, title, author, genre, year FROM books;";
             using (var reader = command.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    Console.WriteLine($"- {reader.GetString(0)}: {reader.GetInt32(1)}");
+                    books.Add(new Book
+                    {
+                        Id = reader.GetInt32(0),
+                        Title = reader.GetString(1),
+                        Author = reader.GetString(2),
+                        Genre = reader.GetString(3),
+                        Year = reader.GetInt32(4)
+                    });
                 }
             }
         }
+        return books;
     }
 }

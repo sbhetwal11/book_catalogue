@@ -20,18 +20,10 @@ public class Program
 
     private static string GetDatabasePath()
     {
-        string? projectDirectory = AppContext.BaseDirectory;
-        while (!string.IsNullOrEmpty(projectDirectory) && !File.Exists(Path.Combine(projectDirectory, "README.md")))
-        {
-            projectDirectory = Directory.GetParent(projectDirectory)?.FullName;
-        }
-
-        if (string.IsNullOrEmpty(projectDirectory))
-        {
-            throw new InvalidOperationException("Could not find the project root directory.");
-        }
-
-        return Path.Combine(projectDirectory, "data", "books.db");
+        var x = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"..", "..", "..", ".."));
+        var dataDir = Path.Combine(x, "data");
+        Directory.CreateDirectory(dataDir);
+        return Path.Combine(dataDir, "books.db");
     }
 
     public static void Main(string[] args)
@@ -228,4 +220,5 @@ public class Program
         }
         return books;
     }
+
 }

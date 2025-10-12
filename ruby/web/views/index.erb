@@ -1,0 +1,60 @@
+<div class="card p-3 mb-3">
+  <form class="row g-2 align-items-center" method="get" action="/">
+    <div class="col-sm-9">
+      <input class="form-control form-control-lg" name="kw"
+             placeholder="Search title / author / genre"
+             value="<%= h(@kw) %>">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-brand btn-lg text-white" type="submit">Search</button>
+    </div>
+    <% if @kw && !@kw.empty? %>
+      <div class="col-auto">
+        <a class="btn btn-outline-secondary btn-lg" href="/">Clear</a>
+      </div>
+    <% end %>
+  </form>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h5 class="mb-0">All Books</h5>
+  <span class="badge rounded-pill badge-soft">
+    <%= @books.length %> total
+  </span>
+</div>
+
+<div class="card p-0">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th style="width:35%">Title</th>
+          <th style="width:25%">Author</th>
+          <th style="width:20%">Genre</th>
+          <th style="width:10%">Year</th>
+          <th style="width:10%">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      <% if @books.empty? %>
+        <tr><td class="text-muted" colspan="5">No books found.</td></tr>
+      <% else %>
+        <% @books.each do |b| %>
+          <tr>
+            <td><%= h b['title'] %></td>
+            <td><%= h b['author'] %></td>
+            <td><%= h b['genre'] %></td>
+            <td><%= h b['year'] %></td>
+            <td>
+              <form method="post" action="/delete/<%= b['id'] %>" class="m-0"
+                    onsubmit="return confirm('Delete this book?')">
+                <button class="btn btn-sm btn-outline-danger">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% end %>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -4,6 +4,10 @@
   "success": true,
   "projectFilePath": "E:\\Svadlapat\\book_catalogue\\csharp\\csharp.csproj",
   "expectedPackageFiles": [
+  "dgSpecHash": "KfL/RDx8I0A=",
+  "success": true,
+  "projectFilePath": "E:\\Svadlapat\\book_catalogue\\csharp\\csharp.csproj",
+  "expectedPackageFiles": [
     "C:\\Users\\HP\\.nuget\\packages\\microsoft.data.sqlite\\9.0.9\\microsoft.data.sqlite.9.0.9.nupkg.sha512",
     "C:\\Users\\HP\\.nuget\\packages\\microsoft.data.sqlite.core\\9.0.9\\microsoft.data.sqlite.core.9.0.9.nupkg.sha512",
     "C:\\Users\\HP\\.nuget\\packages\\sqlitepclraw.bundle_e_sqlite3\\2.1.10\\sqlitepclraw.bundle_e_sqlite3.2.1.10.nupkg.sha512",

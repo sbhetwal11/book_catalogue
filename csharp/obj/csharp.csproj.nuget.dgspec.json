@@ -1,30 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "/workspaces/book_catalogue/csharp/csharp.csproj": {}
+    "E:\\Svadlapat\\book_catalogue\\csharp\\csharp.csproj": {}
   },
   "projects": {
-    "/workspaces/book_catalogue/csharp/csharp.csproj": {
+    "E:\\Svadlapat\\book_catalogue\\csharp\\csharp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspaces/book_catalogue/csharp/csharp.csproj",
+        "projectUniqueName": "E:\\Svadlapat\\book_catalogue\\csharp\\csharp.csproj",
         "projectName": "csharp",
-        "projectPath": "/workspaces/book_catalogue/csharp/csharp.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/book_catalogue/csharp/obj/",
+        "projectPath": "E:\\Svadlapat\\book_catalogue\\csharp\\csharp.csproj",
+        "packagesPath": "C:\\Users\\HP\\.nuget\\packages\\",
+        "outputPath": "E:\\Svadlapat\\book_catalogue\\csharp\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\HP\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net8.0"
+          "net8.0-windows"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
+          "net8.0-windows7.0": {
+            "targetAlias": "net8.0-windows",
             "projectReferences": {}
           }
         },
@@ -40,8 +40,8 @@
         }
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
           "dependencies": {
             "Microsoft.Data.Sqlite": {
               "target": "Package",
@@ -62,9 +62,12 @@
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WindowsForms": {
+              "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.412/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.414/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
